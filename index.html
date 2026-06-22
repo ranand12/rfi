@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cornell University × Google Cloud — Working Session</title>
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+<style>
+:root {
+  --gc-blue: #4285F4;
+  --gc-red: #EA4335;
+  --gc-yellow: #FBBC04;
+  --gc-green: #34A853;
+  --gc-dark-blue: #185ABC;
+  --gc-purple: #8E24AA;
+  --gc-coral: #EE4D5D;
+  --gc-teal: #00897B;
+  --gc-lavender: #AC87EB;
+  --gc-sky: #078EFB;
+  --gc-text: #202124;
+  --gc-secondary: #5F6368;
+  --gc-border: #BDC1C6;
+  --gc-surface: #F8F9FA;
+  --gc-bg: #FFFFFF;
+  --radius: 12px;
+  --gc-blue-light: #D2E3FC;
+  --gc-blue-200: #8AB4F8;
+  --gc-blue-600: #1967D2;
+  --gc-blue-800: #174EA6;
+  --gc-gray-200: #E8EAED;
+  --gc-gray-300: #D9D9D9;
+  --font: 'Google Sans', Arial, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: var(--font);
+  color: var(--gc-text);
+  background: #000;
+  overflow: hidden;
+  cursor: none;
+  -webkit-font-smoothing: antialiased;
+}
+body.cursor-visible { cursor: default; }
+
+.slide {
+  display: none;
+  position: absolute;
+  inset: 0;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 60px 80px;
+  text-align: left;
+  background: var(--gc-bg);
+}
+.slide.active { display: flex; }
+.slide.title-slide { align-items: flex-start; }
+.slide.centered { align-items: center; text-align: center; }
+.slide.dark-bg { background: var(--gc-text); color: #fff; }
+.slide.dark-bg h1, .slide.dark-bg h2, .slide.dark-bg h3 { color: #fff; }
+.slide.dark-bg strong { color: #fff; }
+.slide.dark-bg .subtext { color: rgba(255,255,255,0.7); }
+
+.slide.colored-bg { color: #fff; }
+.slide.colored-bg.gc-green-bg { background: var(--gc-green); }
+.slide.colored-bg.gc-blue-bg { background: var(--gc-blue); }
+.slide.colored-bg .section-number, .slide.colored-bg .section-title { color: inherit; }
+
+h1 { font-size: 2.5rem; font-weight: 700; color: var(--gc-text); letter-spacing: -0.02em; line-height: 1.2; }
+h2 { font-size: 1.875rem; font-weight: 700; color: var(--gc-text); letter-spacing: -0.02em; line-height: 1.3; }
+h3 { font-size: 1.25rem; font-weight: 700; color: var(--gc-text); }
+strong { color: var(--gc-blue); font-weight: 700; }
+.subtext { color: var(--gc-secondary); font-size: 1.1rem; font-weight: 400; }
+.caption { color: var(--gc-secondary); font-size: 0.75rem; }
+.stat-number { font-size: 3.75rem; font-weight: 700; color: var(--gc-text); line-height: 1; }
+.stat-number.xl { font-size: 5rem; }
+.stat-label { font-size: 1.125rem; font-weight: 700; color: var(--gc-text); }
+.stat-desc { font-size: 1rem; font-weight: 400; color: var(--gc-secondary); }
+
+.section-number { font-size: 4rem; font-weight: 700; color: var(--gc-text); line-height: 1; margin-bottom: 8px; }
+.section-title { font-size: 2rem; font-weight: 700; color: var(--gc-text); }
+.section-subtitle { font-size: 1.25rem; color: var(--gc-secondary); margin-top: 16px; max-width: 60%; }
+
+.main-statement { font-size: 1.75rem; font-weight: 400; line-height: 1.6; max-width: 65%; }
+.main-statement strong { font-weight: 700; }
+
+/* Reveal animations */
+.reveal {
+  opacity: 0; transform: translateY(28px);
+  transition: opacity 0.6s cubic-bezier(0.16,1,0.3,1), transform 0.6s cubic-bezier(0.16,1,0.3,1);
+  pointer-events: none;
+}
+.reveal.shown { opacity: 1; transform: translateY(0); pointer-events: auto; }
+.reveal.shown-fast { opacity: 1; transform: translateY(0); pointer-events: auto; transition-duration: 0s; }
+
+.reveal-scale {
+  opacity: 0; transform: scale(0.7);
+  transition: opacity 0.5s cubic-bezier(0.16,1,0.3,1), transform 0.5s cubic-bezier(0.16,1,0.3,1);
+}
+.reveal-scale.shown, .reveal-scale.shown-fast { opacity: 1; transform: scale(1); }
+.reveal-scale.shown-fast { transition-duration: 0s; }
+
+.reveal-blur {
+  opacity: 0; filter: blur(20px); transform: scale(1.05);
+  transition: opacity 0.7s ease, filter 0.7s ease, transform 0.7s ease;
+}
+.reveal-blur.shown, .reveal-blur.shown-fast { opacity: 1; filter: blur(0); transform: scale(1); }
+.reveal-blur.shown-fast { transition-duration: 0s; }
+
+/* Cards */
+.card {
+  background: var(--gc-surface); border: 1px solid rgba(0,0,0,0.08);
+  border-radius: var(--radius); padding: 24px 20px; text-align: left;
+}
+.card.blue-top { border-top: 3px solid var(--gc-blue); }
+.card.red-top { border-top: 3px solid var(--gc-red); }
+.card.yellow-top { border-top: 3px solid var(--gc-yellow); }
+.card.green-top { border-top: 3px solid var(--gc-green); }
+.card.purple-top { border-top: 3px solid var(--gc-purple); }
+.card.teal-top { border-top: 3px solid var(--gc-teal); }
+
+.card-grid { display: grid; gap: 16px; width: 100%; margin-top: 24px; }
+.card-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+.card-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+.card-grid.cols-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+/* Badges */
+.gc-badge {
+  width: 48px; height: 48px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem; color: #fff; flex-shrink: 0; margin-bottom: 12px;
+}
+.gc-badge.lg { width: 56px; height: 56px; font-size: 1.6rem; }
+.gc-badge.blue { background: var(--gc-blue); }
+.gc-badge.red { background: var(--gc-red); }
+.gc-badge.yellow { background: var(--gc-yellow); color: var(--gc-text); }
+.gc-badge.green { background: var(--gc-green); }
+.gc-badge.purple { background: var(--gc-purple); }
+.gc-badge.teal { background: var(--gc-teal); }
+.gc-badge.dark-blue { background: var(--gc-dark-blue); }
+.gc-badge .material-symbols-outlined { font-size: 24px; color: #fff; }
+.gc-badge.lg .material-symbols-outlined { font-size: 28px; }
+.gc-badge.yellow .material-symbols-outlined { color: var(--gc-text); }
+
+/* Tables */
+.gc-table {
+  width: 100%; max-width: 1100px; border-collapse: collapse;
+  font-size: 0.85rem; table-layout: fixed;
+}
+.gc-table th {
+  background: var(--gc-blue); color: #fff; padding: 12px 16px;
+  text-align: center; font-weight: 600;
+}
+.gc-table td {
+  padding: 10px 16px; border-bottom: 1px solid var(--gc-border); text-align: center;
+}
+.gc-table tr:nth-child(even) td { background: var(--gc-surface); }
+.gc-table .highlight-cell { color: var(--gc-blue); font-weight: 700; }
+.gc-table td:first-child { text-align: left; font-weight: 600; }
+
+/* Flow */
+.gc-flow { display: flex; align-items: center; justify-content: center; gap: 0; flex-wrap: wrap; }
+.gc-flow-box {
+  padding: 16px 24px; border-radius: 8px; color: #fff; font-weight: 600;
+  font-size: 0.85rem; text-align: center; min-width: 120px;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+}
+.gc-flow-box.blue { background: var(--gc-blue); }
+.gc-flow-box.red { background: var(--gc-red); }
+.gc-flow-box.yellow { background: var(--gc-yellow); color: var(--gc-text); }
+.gc-flow-box.green { background: var(--gc-green); }
+.gc-flow-box.dark-blue { background: var(--gc-dark-blue); }
+.gc-flow-box.purple { background: var(--gc-purple); }
+.gc-flow-box.teal { background: var(--gc-teal); }
+.gc-flow-box .material-symbols-outlined { font-size: 24px; color: #fff; }
+.gc-flow-box.yellow .material-symbols-outlined { color: var(--gc-text); }
+
+.gc-flow-arrow {
+  width: 32px; height: 2px; background: var(--gc-border);
+  position: relative; flex-shrink: 0;
+}
+.gc-flow-arrow::after {
+  content: ''; position: absolute; right: -1px; top: -5px;
+  border: 6px solid transparent; border-left: 8px solid var(--gc-border);
+}
+
+/* Stats rows */
+.stats-row {
+  display: flex; align-items: baseline; gap: 20px;
+  padding: 14px 0; border-bottom: 1px solid var(--gc-gray-200);
+}
+.stats-row:last-child { border-bottom: none; }
+
+/* Icon row */
+.gc-icon-row {
+  display: flex; align-items: center; gap: 16px; padding: 10px 0;
+}
+.gc-icon-row .gc-label { font-size: 1rem; font-weight: 500; }
+.gc-icon-row .gc-sublabel { font-size: 0.85rem; color: var(--gc-secondary); margin-top: 2px; }
+
+/* Numbered grid */
+.numbered-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 24px; margin-top: 24px; width: 100%;
+}
+.numbered-item-num { font-size: 1.5rem; font-weight: 700; color: var(--gc-blue); margin-bottom: 8px; }
+.numbered-item-title { font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
+.numbered-item-text { font-size: 0.8rem; color: var(--gc-secondary); line-height: 1.5; }
+
+/* Section box */
+.gc-section-box {
+  border-radius: var(--radius); padding: 20px 24px; color: #fff;
+  width: 100%; text-align: left;
+}
+.gc-section-box.blue { background: var(--gc-blue); }
+.gc-section-box.green { background: var(--gc-green); }
+.gc-section-box h3 { color: inherit; margin: 0 0 8px 0; }
+.gc-section-box p { color: inherit; opacity: 0.9; margin: 0; font-size: 0.85rem; }
+
+/* Comparison grid */
+.comparison-grid {
+  display: grid; grid-template-columns: repeat(4,1fr);
+  gap: 12px; margin-top: 24px; width: 100%;
+}
+.comparison-card {
+  border: 1px solid var(--gc-gray-300); border-radius: 8px;
+  padding: 20px; background: #fff; text-align: left;
+}
+.comparison-card h3 { font-size: 0.875rem; font-weight: 700; margin-bottom: 8px; }
+.comparison-card p { font-size: 0.75rem; color: var(--gc-secondary); line-height: 1.5; margin: 0; }
+
+/* Bar chart */
+.bar-row { display: flex; align-items: center; gap: 16px; margin-bottom: 12px; }
+.bar-label-text { width: 140px; font-size: 0.8rem; font-weight: 600; text-align: right; flex-shrink: 0; }
+.bar-track { flex: 1; height: 28px; background: var(--gc-gray-200); border-radius: 6px; overflow: hidden; position: relative; }
+.bar-fill { height: 100%; width: 0%; border-radius: 6px; transition: width 1.2s cubic-bezier(0.16,1,0.3,1); display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; font-size: 0.7rem; color: #fff; font-weight: 600; }
+.bar-fill.blue { background: var(--gc-blue); }
+.bar-fill.green { background: var(--gc-green); }
+.bar-fill.red { background: var(--gc-red); }
+.bar-fill.dark-blue { background: var(--gc-dark-blue); }
+.bar-fill.teal { background: var(--gc-teal); }
+.bar-fill.purple { background: var(--gc-purple); }
+
+/* Split layout */
+.split-layout { display: grid; grid-template-columns: 1fr 1fr; position: absolute; inset: 0; }
+.split-left { background: var(--gc-text); color: #fff; display: flex; flex-direction: column; justify-content: center; padding: 60px; }
+.split-right { background: #fff; color: var(--gc-text); display: flex; flex-direction: column; justify-content: center; padding: 60px; }
+
+/* Progress & Navigation */
+.progress {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 6px; z-index: 200; align-items: center;
+}
+.progress .dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: rgba(0,0,0,0.12); transition: all 0.3s; cursor: pointer;
+}
+.progress .dot.active { background: var(--gc-blue); width: 24px; border-radius: 4px; }
+.slide-number {
+  position: fixed; top: 30px; right: 40px; font-size: 14px;
+  color: rgba(0,0,0,0.2); z-index: 200; font-variant-numeric: tabular-nums;
+}
+
+/* Logo */
+.gc-logo {
+  position: absolute; bottom: 24px; left: 40px; z-index: 101;
+  opacity: 0.7; font-size: 14px; font-weight: 500;
+}
+.slide.title-slide .gc-logo { font-size: 16px; }
+.slide.dark-bg .gc-logo { opacity: 0.5; }
+
+/* Banner */
+.gc-banner {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 8px; display: flex; z-index: 100;
+}
+.gc-banner .gc-band { flex: 1; height: 100%; }
+.gc-banner .gc-band:nth-child(1) { background: var(--gc-blue); }
+.gc-banner .gc-band:nth-child(2) { background: var(--gc-red); }
+.gc-banner .gc-band:nth-child(3) { background: var(--gc-yellow); }
+.gc-banner .gc-band:nth-child(4) { background: var(--gc-green); }
+
+/* Edge dots for colored slides */
+.edge-dots {
+  position: absolute; right: 40px; top: 50%; transform: translateY(-50%);
+  display: flex; flex-direction: column; gap: 16px;
+}
+.edge-dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.4); }
+
+/* Pulse */
+@keyframes softPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(66,133,244,0); }
+  50% { box-shadow: 0 0 30px 0 rgba(66,133,244,0.15); }
+}
+
+/* Timeline */
+.timeline-container { display: flex; align-items: flex-start; gap: 0; width: 100%; margin-top: 32px; position: relative; }
+.timeline-item { flex: 1; text-align: center; position: relative; padding-top: 40px; }
+.timeline-item::before {
+  content: ''; position: absolute; top: 16px; left: 0; right: 0; height: 2px; background: var(--gc-gray-200);
+}
+.timeline-item:first-child::before { left: 50%; }
+.timeline-item:last-child::before { right: 50%; }
+.timeline-dot {
+  width: 12px; height: 12px; border-radius: 50%; background: var(--gc-blue);
+  position: absolute; top: 11px; left: 50%; transform: translateX(-50%); z-index: 1;
+}
+.timeline-item .t-label { font-size: 0.7rem; font-weight: 700; color: var(--gc-blue); margin-bottom: 4px; }
+.timeline-item .t-text { font-size: 0.75rem; color: var(--gc-secondary); line-height: 1.4; padding: 0 8px; }
+
+/* Responsive */
+@media (max-width: 700px) {
+  .slide { padding: 40px 30px; }
+  .card-grid.cols-3, .card-grid.cols-4 { grid-template-columns: 1fr; }
+  .comparison-grid { grid-template-columns: 1fr 1fr; }
+  .numbered-grid { grid-template-columns: 1fr; }
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  font-size: 24px; vertical-align: -0.125em; display: inline-block; line-height: 1; flex-shrink: 0;
+}
+</style>
+</head>
+<body>
+
+<!-- SLIDE 1: Title -->
+<div class="slide active title-slide" id="slide-1">
+  <div class="gc-logo" style="font-size:18px;"><span style="color:#4285F4">G</span><span style="color:#EA4335">o</span><span style="color:#FBBC04">o</span><span style="color:#4285F4">g</span><span style="color:#34A853">l</span><span style="color:#EA4335">e</span> <span style="color:#5F6368">Cloud</span></div>
+  <div class="reveal" data-step="0">
+    <h1 style="font-size:2.8rem;">Cornell University ×<br>Google Cloud</h1>
+    <p class="subtext" style="margin-top:16px; font-size:1.3rem;">AI Research Infrastructure & Strategic Partnership</p>
+  </div>
+  <div class="reveal" data-step="1" style="margin-top:32px;">
+    <p style="color:var(--gc-secondary); font-size:1rem;">Downselection Working Session · June 2026</p>
+    <p style="color:var(--gc-secondary); font-size:0.85rem; margin-top:8px;">A collaborative design conversation — not a product demo</p>
+  </div>
+  <div class="gc-banner"><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div></div>
+</div>
+
+<!-- SLIDE 2: Our Approach -->
+<div class="slide dark-bg" id="slide-2">
+  <div class="gc-logo"><span style="color:#4285F4">G</span><span style="color:#EA4335">o</span><span style="color:#FBBC04">o</span><span style="color:#4285F4">g</span><span style="color:#34A853">l</span><span style="color:#EA4335">e</span> <span style="color:rgba(255,255,255,0.5)">Cloud</span></div>
+  <div class="reveal" data-step="0">
+    <p class="main-statement" style="color:#fff;">"You asked us to <strong style="color:var(--gc-blue-200);">think together</strong>, not present. You see this as a true partnership — one that extends to collaboration with your <strong style="color:var(--gc-blue-200);">faculty and students</strong> on research and innovation. We'd like to leave with a <strong style="color:var(--gc-blue-200);">shared design</strong>, not a slide deck."</p>
+  </div>
+  <div class="reveal" data-step="1" style="margin-top:40px;">
+    <p style="color:rgba(255,255,255,0.5); font-size:0.9rem;">Today's agenda mirrors Cornell's priorities:</p>
+    <div style="display:flex; gap:32px; margin-top:16px;">
+      <div style="display:flex; align-items:center; gap:8px;"><span class="material-symbols-outlined" style="color:var(--gc-blue-200);">dns</span><span style="color:rgba(255,255,255,0.8); font-size:0.95rem;">Technology & Operating Model</span></div>
+      <div style="display:flex; align-items:center; gap:8px;"><span class="material-symbols-outlined" style="color:var(--gc-green);">savings</span><span style="color:rgba(255,255,255,0.8); font-size:0.95rem;">Funding & Cost Model</span></div>
+      <div style="display:flex; align-items:center; gap:8px;"><span class="material-symbols-outlined" style="color:var(--gc-yellow);">handshake</span><span style="color:rgba(255,255,255,0.8); font-size:0.95rem;">Partnership & Next Steps</span></div>
+    </div>
+  </div>
+  <div class="gc-banner"><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div></div>
+</div>
+
+<!-- SLIDE 3: Partnership History -->
+<div class="slide" id="slide-3">
+  <div class="gc-logo"><span style="color:#4285F4">G</span><span style="color:#EA4335">o</span><span style="color:#FBBC04">o</span><span style="color:#4285F4">g</span><span style="color:#34A853">l</span><span style="color:#EA4335">e</span> <span style="color:#5F6368">Cloud</span></div>
+  <div class="reveal" data-step="0">
+    <h2>A <strong>15+ Year</strong> Partnership</h2>
+    <p class="subtext">This isn't a new relationship — it's a deeper chapter</p>
+  </div>
+  <div class="card-grid cols-4" style="margin-top:28px;">
+    <div class="card blue-top reveal-scale" data-step="1">
+      <div class="gc-badge blue"><span class="material-symbols-outlined">shield</span></div>
+      <h3 style="font-size:0.9rem;">Cyber NYC Program</h3>
+      <p style="font-size:2rem; font-weight:700; color:var(--gc-blue); margin:8px 0;">$12M</p>
+      <p class="caption">90 collaborative research projects in online privacy & security</p>
+    </div>
+    <div class="card red-top reveal-scale" data-step="2">
+      <div class="gc-badge red"><span class="material-symbols-outlined">apartment</span></div>
+      <h3 style="font-size:0.9rem;">Cornell Tech Space</h3>
+      <p style="font-size:2rem; font-weight:700; color:var(--gc-red); margin:8px 0;">$10M+</p>
+      <p class="caption">22,000 sq ft donated at Google Chelsea HQ (2012–2017)</p>
+    </div>
+    <div class="card yellow-top reveal-scale" data-step="3">
+      <div class="gc-badge yellow"><span class="material-symbols-outlined">menu_book</span></div>
+      <h3 style="font-size:0.9rem;">arXiv Infrastructure</h3>
+      <p style="font-size:2rem; font-weight:700; color:var(--gc-yellow); margin:8px 0;">2.4M+</p>
+      <p class="caption">Open-access articles supported with 400M+ monthly views</p>
+    </div>
+    <div class="card green-top reveal-scale" data-step="4">
+      <div class="gc-badge green"><span class="material-symbols-outlined">school</span></div>
+      <h3 style="font-size:0.9rem;">Research & Fellows</h3>
+      <p style="font-size:2rem; font-weight:700; color:var(--gc-green); margin:8px 0;">$16M+</p>
+      <p class="caption">Total Google funding — PhD fellowships, Faculty Awards, Research Scholars</p>
+    </div>
+  </div>
+  <div class="gc-banner"><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div></div>
+</div>
+
+<!-- SLIDE 4: Section — Technology -->
+<div class="slide colored-bg gc-blue-bg" id="slide-4">
+  <div class="gc-logo"><span style="color:rgba(255,255,255,0.8)">G</span><span style="color:rgba(255,255,255,0.6)">o</span><span style="color:rgba(255,255,255,0.8)">o</span><span style="color:rgba(255,255,255,0.8)">g</span><span style="color:rgba(255,255,255,0.6)">l</span><span style="color:rgba(255,255,255,0.6)">e</span> <span style="color:rgba(255,255,255,0.5)">Cloud</span></div>
+  <div class="reveal" data-step="0">
+    <div class="section-number" style="color:#fff;">01</div>
+    <div class="section-title" style="color:#fff;">Technology &<br>Operating Model</div>
+  </div>
+  <div class="reveal" data-step="1" style="margin-top:24px; max-width:50%;">
+    <p style="opacity:0.85; font-size:1rem;">Designing a unified hybrid environment that extends your Phase 1 investment</p>
+  </div>
+  <div class="edge-dots"><div class="edge-dot"></div><div class="edge-dot"></div><div class="edge-dot"></div><div class="edge-dot"></div></div>
+  <div class="gc-banner"><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div></div>
+</div>
+
+<!-- SLIDE 5: Hybrid Environment — Phase 1 → Phase 2 -->
+<div class="slide" id="slide-5">
+  <div class="gc-logo"><span style="color:#4285F4">G</span><span style="color:#EA4335">o</span><span style="color:#FBBC04">o</span><span style="color:#4285F4">g</span><span style="color:#34A853">l</span><span style="color:#EA4335">e</span> <span style="color:#5F6368">Cloud</span></div>
+  <div class="reveal" data-step="0">
+    <h2>Extending <strong>Phase 1</strong> Into the Cloud</h2>
+    <p class="subtext">Same workflows, elastic capacity — one unified control plane</p>
+  </div>
+  <table class="gc-table reveal" data-step="1" style="margin-top:24px;">
+    <tr><th style="width:25%;">Cornell Phase 1</th><th style="width:40%;">Google Cloud Phase 2</th><th style="width:35%;">Why It's Seamless</th></tr>
+    <tr><td>On-prem B300 GPUs</td><td>Elastic A4 (B200), A3 Ultra (H200), TPU v6e/v7</td><td>Same GKE control plane spans both environments</td></tr>
+    <tr><td>Slurm Scheduler</td><td>Cluster Director (managed Slurm) + DWS</td><td>Researchers add cloud partitions — familiar <code>sbatch</code></td></tr>
+    <tr><td>On-prem NFS Storage</td><td>Managed Lustre · Rapid Cache · Rapid Bucket</td><td>POSIX-compliant, no code changes required</td></tr>
+    <tr><td>2×10Gbps Connectivity</td><td>400G Cloud Interconnect (GA)</td><td>Direct, high-bandwidth private link to Ithaca</td></tr>
+    <tr><td>Regional HPC (ACCESS, NYS)</td><td>GDC + Cross-Cloud Interconnect</td><td>One scheduler spans on-prem, regional, <em>and</em> cloud</td></tr>
+  </table>
+  <div class="gc-banner"><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div></div>
+</div>
+
+<!-- SLIDE 6: Storage & Data Architecture -->
+<div class="slide" id="slide-6">
+  <div class="gc-logo"><span style="color:#4285F4">G</span><span style="color:#EA4335">o</span><span style="color:#FBBC04">o</span><span style="color:#4285F4">g</span><span style="color:#34A853">l</span><span style="color:#EA4335">e</span> <span style="color:#5F6368">Cloud</span></div>
+  <div class="reveal" data-step="0">
+    <h2>High-Performance <strong>Storage</strong> for Research</h2>
+    <p class="subtext">Eliminate data starvation — accelerators never wait for data</p>
+  </div>
+  <div class="card-grid cols-3" style="margin-top:24px;">
+    <div class="card blue-top reveal-scale" data-step="1">
+      <div class="gc-badge blue lg"><span class="material-symbols-outlined">storage</span></div>
+      <h3>Managed Lustre</h3>
+      <p style="font-size:2rem; font-weight:700; color:var(--gc-blue); margin:8px 0;">10 TB/s</p>
+      <p class="caption">Up to 80 PB capacity · Full POSIX compliance · 10× increase announced at Next '26</p>
+    </div>
+    <div class="card green-top reveal-scale" data-step="2">
+      <div class="gc-badge green lg"><span class="material-symbols-outlined">bolt</span></div>
+      <h3>Rapid Cache</h3>
+      <p style="font-size:2rem; font-weight:700; color:var(--gc-green); margin:8px 0;">2.5 TB/s</p>
+      <p class="caption">SSD-backed zonal read cache · Auto-scaling · Zero app changes · 2.2× faster checkpoint restores</p>
+    </div>
+    <div class="card red-top reveal-scale" data-step="3">
+      <div class="gc-badge red lg"><span class="material-symbols-outlined">speed</span></div>
+      <h3>Rapid Bucket</h3>
+      <p style="font-size:2rem; font-weight:700; color:var(--gc-red); margin:8px 0;">15 TB/s</p>
+      <p class="caption">Sub-ms latency · 20M QPS · Appendable objects for streaming checkpoints</p>
+    </div>
+  </div>
+  <div class="gc-banner"><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div></div>
+</div>
+
+<!-- SLIDE 7: Vertical Integration -->
+<div class="slide dark-bg" id="slide-7">
+  <div class="gc-logo"><span style="color:#4285F4">G</span><span style="color:#EA4335">o</span><span style="color:#FBBC04">o</span><span style="color:#4285F4">g</span><span style="color:#34A853">l</span><span style="color:#EA4335">e</span> <span style="color:rgba(255,255,255,0.5)">Cloud</span></div>
+  <div class="reveal" data-step="0">
+    <h2 style="color:#fff;">The Only <strong style="color:var(--gc-blue-200);">Vertically Integrated</strong> AI Stack</h2>
+    <p style="color:rgba(255,255,255,0.6); margin-top:8px; font-size:0.95rem;">Same infrastructure that trains Gemini — available to Cornell researchers</p>
+  </div>
+  <div class="gc-flow reveal" data-step="1" style="margin-top:40px; gap:0;">
+    <div class="gc-flow-box dark-blue" style="min-width:140px;">
+      <span class="material-symbols-outlined">memory</span>
+      <span>Custom Silicon</span>
+      <span style="font-size:0.65rem; opacity:0.8;">TPU v7 · TPU 8t/8i</span>
+    </div>
+    <div class="gc-flow-arrow" style="background:rgba(255,255,255,0.2);"></div>
+    <div class="gc-flow-box blue" style="min-width:140px;">
+      <span class="material-symbols-outlined">lan</span>
+      <span>Virgo Network</span>
+      <span style="font-size:0.65rem; opacity:0.8;">47 Pbps · 134K chips</span>
+    </div>
+    <div class="gc-flow-arrow" style="background:rgba(255,255,255,0.2);"></div>
+    <div class="gc-flow-box teal" style="min-width:140px;">
+      <span class="material-symbols-outlined">code</span>
+      <span>ML Frameworks</span>
+      <span style="font-size:0.65rem; opacity:0.8;">JAX · TorchTPU · TF</span>
+    </div>
+    <div class="gc-flow-arrow" style="background:rgba(255,255,255,0.2);"></div>
+    <div class="gc-flow-box green" style="min-width:140px;">
+      <span class="material-symbols-outlined">auto_awesome</span>
+      <span>Frontier Models</span>
+      <span style="font-size:0.65rem; opacity:0.8;">Gemini · Gemma · AlphaFold</span>
+    </div>
+  </div>
+  <div class="reveal" data-step="2" style="margin-top:32px;">
+    <p style="color:rgba(255,255,255,0.5); font-size:0.85rem; max-width:70%;">No other cloud provider builds their own AI accelerators, network fabric, <em>and</em> ML frameworks. AWS and Azure resell NVIDIA GPUs — Google builds the entire stack.</p>
+  </div>
+  <div class="gc-banner"><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div></div>
+</div>
+
+<!-- SLIDE 8: Silicon Roadmap -->
+<div class="slide" id="slide-8">
+  <div class="gc-logo"><span style="color:#4285F4">G</span><span style="color:#EA4335">o</span><span style="color:#FBBC04">o</span><span style="color:#4285F4">g</span><span style="color:#34A853">l</span><span style="color:#EA4335">e</span> <span style="color:#5F6368">Cloud</span></div>
+  <div class="reveal" data-step="0">
+    <h2>Silicon <strong>Roadmap</strong> — No Capital Outlay</h2>
+    <p class="subtext">Cornell accesses next-gen hardware as it ships — no procurement cycles</p>
+  </div>
+  <div class="card-grid cols-3" style="margin-top:24px;">
+    <div class="card blue-top reveal-scale" data-step="1">
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+        <div class="gc-badge blue"><span class="material-symbols-outlined">memory</span></div>
+        <div><span style="font-size:0.7rem; color:var(--gc-green); font-weight:700;">GA — April 2026</span></div>
+      </div>
+      <h3>TPU v7 (Ironwood)</h3>
+      <p style="font-size:0.85rem; color:var(--gc-secondary); margin-top:8px; line-height:1.6;">
+        <strong style="color:var(--gc-text);">4,614</strong> FP8 TFLOPS/chip<br>
+        <strong style="color:var(--gc-text);">192 GB</strong> HBM3E<br>
+        <strong style="color:var(--gc-text);">42.5 ExaFLOPS</strong> per superpod<br>
+        <strong style="color:var(--gc-text);">2×</strong> perf/watt vs Trillium
+      </p>
+    </div>
+    <div class="card green-top reveal-scale" data-step="2">
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+        <div class="gc-badge green"><span class="material-symbols-outlined">model_training</span></div>
+        <div><span style="font-size:0.7rem; color:var(--gc-blue); font-weight:700;">DEPLOYING — H2 2026</span></div>
+      </div>
+      <h3>TPU 8t (Training)</h3>
+      <p style="font-size:0.85rem; color:var(--gc-secondary); margin-top:8px; line-height:1.6;">
+        <strong style="color:var(--gc-text);">121 ExaFLOPS</strong> FP4/superpod<br>
+        <strong style="color:var(--gc-text);">2.7×</strong> perf/dollar vs Ironwood<br>
+        <strong style="color:var(--gc-text);">9,600</strong> chips per superpod<br>
+        Designed by Broadcom
+      </p>
+    </div>
+    <div class="card red-top reveal-scale" data-step="3">
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+        <div class="gc-badge red"><span class="material-symbols-outlined">neurology</span></div>
+        <div><span style="font-size:0.7rem; color:var(--gc-blue); font-weight:700;">DEPLOYING — H2 2026</span></div>
+      </div>
+      <h3>TPU 8i (Inference)</h3>
+      <p style="font-size:0.85rem; color:var(--gc-secondary); margin-top:8px; line-height:1.6;">
+        <strong style="color:var(--gc-text);">11.6 ExaFLOPS</strong> FP8/pod<br>
+        <strong style="color:var(--gc-text);">80%</strong> perf/dollar vs Ironwood<br>
+        <strong style="color:var(--gc-text);">384 MB</strong> on-chip SRAM<br>
+        Designed by MediaTek
+      </p>
+    </div>
+  </div>
+  <div class="reveal" data-step="4" style="margin-top:16px;">
+    <p class="caption">Also available: NVIDIA B200 (A4 VMs), H200 (A3 Ultra), and A5X (Vera Rubin NVL72) on the Virgo network roadmap — up to 80K GPUs per data center</p>
+  </div>
+  <div class="gc-banner"><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div></div>
+</div>
+
+<!-- SLIDE 9: Workload Placement Tiers -->
+<div class="slide" id="slide-9">
+  <div class="gc-logo"><span style="color:#4285F4">G</span><span style="color:#EA4335">o</span><span style="color:#FBBC04">o</span><span style="color:#4285F4">g</span><span style="color:#34A853">l</span><span style="color:#EA4335">e</span> <span style="color:#5F6368">Cloud</span></div>
+  <div class="reveal" data-step="0">
+    <h2>Workload <strong>Placement</strong> Tiers</h2>
+    <p class="subtext">An operating model, not just a pricing table</p>
+  </div>
+  <table class="gc-table reveal" data-step="1" style="margin-top:24px;">
+    <tr><th>Workload Type</th><th>How It's Scheduled</th><th>Cost Posture</th><th>Duration</th></tr>
+    <tr><td>Baseline (30–60% always-on)</td><td>3Y CUD + Zonal Reservation</td><td class="highlight-cell">Lowest — competitive with on-prem</td><td>Unlimited</td></tr>
+    <tr><td>Planned Training Runs</td><td>Future Reservations — Calendar Mode</td><td>Capacity certainty</td><td>Up to 90 days</td></tr>
+    <tr><td>Conference Burst (3× peak)</td><td>DWS Flex-start</td><td class="highlight-cell">Up to 40% discount</td><td>7 days</td></tr>
+    <tr><td>Experimentation / PoCs</td><td>Spot VMs + Research Credits</td><td>Near-zero for new faculty</td><td>Preemptible</td></tr>
+  </table>
+  <div class="reveal" data-step="2" style="margin-top:20px;">
+    <div style="background:var(--gc-surface); border-radius:8px; padding:16px 20px; border-left:4px solid var(--gc-blue); max-width:80%;">
+      <p style="font-size:0.85rem; color:var(--gc-secondary);"><span class="material-symbols-outlined" style="font-size:18px; vertical-align:-3px; color:var(--gc-blue);">help</span> <strong style="color:var(--gc-text);">Design question for Cornell:</strong> What does your peak burst look like? 50 researchers before NeurIPS, or 3 labs running massive distributed jobs? The architecture choices differ.</p>
+    </div>
+  </div>
+  <div class="gc-banner"><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div></div>
+</div>
+
+<!-- SLIDE 10: Recommended Compute Architecture -->
+<div class="slide" id="slide-10">
+  <div class="gc-logo"><span style="color:#4285F4">G</span><span style="color:#EA4335">o</span><span style="color:#FBBC04">o</span><span style="color:#4285F4">g</span><span style="color:#34A853">l</span><span style="color:#EA4335">e</span> <span style="color:#5F6368">Cloud</span></div>
+  <div class="reveal" data-step="0">
+    <h2>Recommended <strong>Compute</strong> Architecture</h2>
+    <p class="subtext">B200 + H100 + TPU hybrid — best-of-breed for every workload type</p>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:24px; width:100%;">
+    <div class="reveal-scale" data-step="1">
+      <div class="card blue-top" style="height:100%;">
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:16px;">
+          <div class="gc-badge blue"><span class="material-symbols-outlined">memory</span></div>
+          <div><h3 style="font-size:1rem;">Baseline (Always-On)</h3><span style="font-size:0.7rem; color:var(--gc-green); font-weight:700;">3-Year CUD</span></div>
+        </div>
+        <div style="font-size:0.85rem; color:var(--gc-secondary); line-height:2;">
+          <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--gc-gray-200); padding:4px 0;">
+            <span><strong style="color:var(--gc-text);">3× A4 VMs</strong> (24 B200 GPUs)</span>
+            <span style="font-size:0.75rem;">$56.71/VM-hr</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--gc-gray-200); padding:4px 0;">
+            <span><strong style="color:var(--gc-text);">3× A3 High VMs</strong> (24 H100 GPUs)</span>
+            <span style="font-size:0.75rem;">$38.57/VM-hr</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:4px 0;">
+            <span><strong style="color:var(--gc-blue);">1× TPU v6e slice</strong> (16 Trillium chips)</span>
+            <span style="font-size:0.75rem; color:var(--gc-blue); font-weight:600;">$1.22/chip-hr</span>
+          </div>
+        </div>
+        <p style="font-size:0.75rem; color:var(--gc-secondary); margin-top:12px; font-style:italic;">48 GPUs + 16 TPUs always available — competitive with on-prem amortized cost</p>
+      </div>
+    </div>
+    <div class="reveal-scale" data-step="2">
+      <div class="card red-top" style="height:100%;">
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:16px;">
+          <div class="gc-badge red"><span class="material-symbols-outlined">bolt</span></div>
+          <div><h3 style="font-size:1rem;">Burst (Conference Peak)</h3><span style="font-size:0.7rem; color:var(--gc-blue); font-weight:700;">DWS Calendar Mode · 20% utilization</span></div>
+        </div>
+        <div style="font-size:0.85rem; color:var(--gc-secondary); line-height:2;">
+          <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--gc-gray-200); padding:4px 0;">
+            <span><strong style="color:var(--gc-text);">20× A4 VMs</strong> (160 B200 GPUs)</span>
+            <span style="font-size:0.75rem;">$90.22/VM-hr</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:4px 0;">
+            <span><strong style="color:var(--gc-text);">17× A3 High VMs</strong> (136 H100 GPUs)</span>
+            <span style="font-size:0.75rem;">$40.97/VM-hr</span>
+          </div>
+        </div>
+        <p style="font-size:0.75rem; color:var(--gc-secondary); margin-top:12px; font-style:italic;">296 burst GPUs — 3× peak capacity for conference deadlines</p>
+      </div>
+    </div>
+  </div>
+  <div class="reveal" data-step="3" style="margin-top:16px;">
+    <div style="display:flex; gap:24px;">
+      <div style="background:var(--gc-surface); border-radius:8px; padding:12px 16px; border-left:3px solid var(--gc-blue); flex:1;">
+        <p style="font-size:0.8rem;"><strong style="color:var(--gc-blue);">Why this mix:</strong> <span style="color:var(--gc-secondary);">B200 for latest-gen CUDA workloads, H100 for cost-optimized training, TPU v6e at $1.22/chip-hr for transformer workloads — 3 accelerator tiers, one unified platform.</span></p>
+      </div>
+      <div style="background:var(--gc-surface); border-radius:8px; padding:12px 16px; border-left:3px solid var(--gc-green); flex:1;">
+        <p style="font-size:0.8rem;"><strong style="color:var(--gc-green);">Plus:</strong> <span style="color:var(--gc-secondary);">GCS (400TB), 2×10Gbps Interconnect, BigQuery, Gemini API — ~$185K/yr in supporting services.</span></p>
+      </div>
+    </div>
+  </div>
+  <div class="gc-banner"><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div></div>
+</div>
+
+<!-- SLIDE 11: TPU Opportunity -->
+<div class="slide" id="slide-11">
+  <div class="gc-logo"><span style="color:#4285F4">G</span><span style="color:#EA4335">o</span><span style="color:#FBBC04">o</span><span style="color:#4285F4">g</span><span style="color:#34A853">l</span><span style="color:#EA4335">e</span> <span style="color:#5F6368">Cloud</span></div>
+  <div class="reveal" data-step="0" style="padding:0;">
+    <div class="split-layout" style="position:relative; width:100vw; margin-left:-80px; height:100vh; margin-top:-60px;">
+      <div class="split-left" style="padding:60px;">
+        <h2 style="color:#fff; font-size:1.6rem;">The <strong style="color:var(--gc-blue-200);">TPU</strong> Question</h2>
+        <p style="color:rgba(255,255,255,0.7); margin-top:16px; font-size:0.9rem; line-height:1.6;">Cornell asked: "Is TPU compatibility with CUDA at that level?"</p>
+        <p style="color:rgba(255,255,255,0.9); margin-top:16px; font-size:0.9rem; line-height:1.6;">The honest answer: <strong style="color:var(--gc-blue-200);">TPUs don't run CUDA.</strong></p>
+        <p style="color:rgba(255,255,255,0.7); margin-top:16px; font-size:0.85rem; line-height:1.6;">With <strong style="color:#fff;">TorchTPU</strong> (now in preview), the same PyTorch code works on TPUs — <code style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:0.8rem;">device='tpu'</code> instead of <code style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:0.8rem;">device='cuda'</code></p>
+      </div>
+      <div class="split-right" style="padding:60px;">
+        <h3 style="margin-bottom:20px;">Proposed Next Step</h3>
+        <div style="background:var(--gc-surface); border-radius:12px; padding:24px; border:2px solid var(--gc-blue);">
+          <p style="font-size:0.95rem; font-weight:700; color:var(--gc-blue); margin-bottom:12px;">Side-by-Side Benchmark</p>
+          <p style="font-size:0.85rem; color:var(--gc-secondary); line-height:1.6;">Run a real Cornell faculty workload on both:<br><br>
+          <strong style="color:var(--gc-text);">B200 GPU</strong> (full CUDA, no changes)<br>vs<br>
+          <strong style="color:var(--gc-blue);">TPU v7 Ironwood</strong> (TorchTPU)<br><br>
+          If price-performance is 2× better on TPU — as we've seen in transformer workloads — your researchers will want the option.</p>
+        </div>
+        <p style="font-size:0.75rem; color:var(--gc-secondary); margin-top:12px;">No pressure to switch. Just data.</p>
+      </div>
+    </div>
+  </div>
+  <div class="gc-banner"><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div></div>
+</div>
+
+<!-- SLIDE 11: Researcher Personas -->
+<div class="slide" id="slide-12">
+  <div class="gc-logo"><span style="color:#4285F4">G</span><span style="color:#EA4335">o</span><span style="color:#FBBC04">o</span><span style="color:#4285F4">g</span><span style="color:#34A853">l</span><span style="color:#EA4335">e</span> <span style="color:#5F6368">Cloud</span></div>
+  <div class="reveal" data-step="0">
+    <h2>Seamless <strong>Researcher</strong> Experience</h2>
+    <p class="subtext">Every persona gets the right interface — backed by the Academic Pod</p>
+  </div>
+  <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:10px; width:100%; margin-top:20px;">
+    <div class="comparison-card reveal-scale" data-step="1" style="border-top:3px solid var(--gc-blue); padding:16px;">
+      <div class="gc-badge blue" style="width:40px; height:40px;"><span class="material-symbols-outlined" style="font-size:20px;">terminal</span></div>
+      <h3 style="font-size:0.8rem;">HPC-Native PI</h3>
+      <p style="margin-top:6px; font-size:0.7rem;"><strong style="color:var(--gc-text);">Needs:</strong> Cloud Slurm like on-prem</p>
+      <p style="margin-top:6px; font-size:0.7rem;"><strong style="color:var(--gc-blue);">Gets:</strong> Cluster Director + DWS, familiar sbatch</p>
+    </div>
+    <div class="comparison-card reveal-scale" data-step="2" style="border-top:3px solid var(--gc-green); padding:16px;">
+      <div class="gc-badge green" style="width:40px; height:40px;"><span class="material-symbols-outlined" style="font-size:20px;">psychology</span></div>
+      <h3 style="font-size:0.8rem;">Data Science Faculty</h3>
+      <p style="margin-top:6px; font-size:0.7rem;"><strong style="color:var(--gc-text);">Needs:</strong> Managed platform, no infra</p>
+      <p style="margin-top:6px; font-size:0.7rem;"><strong style="color:var(--gc-green);">Gets:</strong> Gemini Enterprise, Colab Enterprise</p>
+    </div>
+    <div class="comparison-card reveal-scale" data-step="3" style="border-top:3px solid var(--gc-purple); padding:16px;">
+      <div class="gc-badge purple" style="width:40px; height:40px;"><span class="material-symbols-outlined" style="font-size:20px;">school</span></div>
+      <h3 style="font-size:0.8rem;">Graduate Student</h3>
+      <p style="margin-top:6px; font-size:0.7rem;"><strong style="color:var(--gc-text);">Needs:</strong> Access without PI gatekeeping</p>
+      <p style="margin-top:6px; font-size:0.7rem;"><strong style="color:var(--gc-purple);">Gets:</strong> Cloud Skill Boost, student credits, PhD Fellowship pipeline</p>
+    </div>
+    <div class="comparison-card reveal-scale" data-step="4" style="border-top:3px solid var(--gc-yellow); padding:16px;">
+      <div class="gc-badge yellow" style="width:40px; height:40px;"><span class="material-symbols-outlined" style="font-size:20px;">rocket_launch</span></div>
+      <h3 style="font-size:0.8rem;">New Faculty Hire</h3>
+      <p style="margin-top:6px; font-size:0.7rem;"><strong style="color:var(--gc-text);">Needs:</strong> Fast start, low friction</p>
+      <p style="margin-top:6px; font-size:0.7rem;"><strong style="color:var(--gc-yellow);">Gets:</strong> $5K/yr credits, pre-configured envs</p>
+    </div>
+    <div class="comparison-card reveal-scale" data-step="5" style="border-top:3px solid var(--gc-red); padding:16px;">
+      <div class="gc-badge red" style="width:40px; height:40px;"><span class="material-symbols-outlined" style="font-size:20px;">admin_panel_settings</span></div>
+      <h3 style="font-size:0.8rem;">IT / CIT Admin</h3>
+      <p style="margin-top:6px; font-size:0.7rem;"><strong style="color:var(--gc-text);">Needs:</strong> Chargeback, governance</p>
+      <p style="margin-top:6px; font-size:0.7rem;"><strong style="color:var(--gc-red);">Gets:</strong> CCM Console, SCC + Wiz + Mandiant</p>
+    </div>
+  </div>
+  <div class="gc-banner"><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div></div>
+</div>
+
+<!-- SLIDE 12b: Operational Model — Who Runs What -->
+<div class="slide" id="slide-13">
+  <div class="gc-logo"><span style="color:#4285F4">G</span><span style="color:#EA4335">o</span><span style="color:#FBBC04">o</span><span style="color:#4285F4">g</span><span style="color:#34A853">l</span><span style="color:#EA4335">e</span> <span style="color:#5F6368">Cloud</span></div>
+  <div class="reveal" data-step="0">
+    <h2>Design <strong>& Operate</strong> — Not Just Design</h2>
+    <p class="subtext">You asked us to help operate the full model, not just provide a piece of it</p>
+  </div>
+  <table class="gc-table reveal" data-step="1" style="margin-top:20px; font-size:0.8rem;">
+    <tr><th style="width:25%;">Function</th><th style="width:25%;">Who</th><th style="width:50%;">How</th></tr>
+    <tr><td>Cluster Mgmt & Patching</td><td class="highlight-cell">Google (Cluster Director)</td><td>Fully managed — autohealing, live migration, firmware updates</td></tr>
+    <tr><td>Job Scheduling & Priorities</td><td>Cornell CIT + Google advisory</td><td>Cornell keeps control of research priorities; Google provides tooling</td></tr>
+    <tr><td>Storage & Data Lifecycle</td><td>Joint</td><td>Managed Lustre + GCS lifecycle rules; Cornell sets retention per grant</td></tr>
+    <tr><td>Security & Compliance</td><td class="highlight-cell">Google SCC + Wiz + Mandiant</td><td>Continuous monitoring; Mandiant on-demand for incident response</td></tr>
+    <tr><td>Cost Optimization</td><td>Google TAM, quarterly</td><td>Review utilization, right-size CUDs, identify waste</td></tr>
+    <tr><td>Escalation</td><td>Named Academic Pod lead</td><td>&lt;4hr response P1 · Weekly sync with Cornell CIT</td></tr>
+  </table>
+  <div class="reveal" data-step="2" style="margin-top:16px;">
+    <div style="background:var(--gc-surface); border-radius:8px; padding:14px 20px; border-left:4px solid var(--gc-blue); max-width:80%;">
+      <p style="font-size:0.85rem; color:var(--gc-secondary);"><span class="material-symbols-outlined" style="font-size:18px; vertical-align:-3px; color:var(--gc-blue);">help</span> <strong style="color:var(--gc-text);">Design question:</strong> How do you envision the operational split? Full managed, or Google as a consultative layer while your team operates?</p>
+    </div>
+  </div>
+  <div class="gc-banner"><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div></div>
+</div>
+
+<!-- SLIDE 13: Section — Funding -->
+<div class="slide colored-bg gc-green-bg" id="slide-14">
+  <div class="gc-logo"><span style="color:rgba(255,255,255,0.8)">G</span><span style="color:rgba(255,255,255,0.6)">o</span><span style="color:rgba(255,255,255,0.8)">o</span><span style="color:rgba(255,255,255,0.8)">g</span><span style="color:rgba(255,255,255,0.6)">l</span><span style="color:rgba(255,255,255,0.6)">e</span> <span style="color:rgba(255,255,255,0.5)">Cloud</span></div>
+  <div class="reveal" data-step="0">
+    <div class="section-number" style="color:#fff;">02</div>
+    <div class="section-title" style="color:#fff;">Funding &<br>Cost Model</div>
+  </div>
+  <div class="reveal" data-step="1" style="margin-top:24px; max-width:50%;">
+    <p style="opacity:0.85; font-size:1rem;">Transparent costing, grant chargeback, and predictable economics</p>
+  </div>
+  <div class="edge-dots"><div class="edge-dot"></div><div class="edge-dot"></div><div class="edge-dot"></div><div class="edge-dot"></div></div>
+  <div class="gc-banner"><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div></div>
+</div>
+
+<!-- SLIDE 14: Co-Investment -->
+<div class="slide" id="slide-15">
+  <div class="gc-logo"><span style="color:#4285F4">G</span><span style="color:#EA4335">o</span><span style="color:#FBBC04">o</span><span style="color:#4285F4">g</span><span style="color:#34A853">l</span><span style="color:#EA4335">e</span> <span style="color:#5F6368">Cloud</span></div>
+  <div class="reveal" data-step="0">
+    <h2>A <strong>Co-Investment</strong> — Not a Vendor Deal</h2>
+    <p class="subtext">Google contributes more than Cornell commits</p>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:40px; margin-top:28px; width:100%;">
+    <div class="reveal-scale" data-step="1">
+      <div style="background:var(--gc-surface); border-radius:var(--radius); padding:28px; border-left:4px solid var(--gc-blue);">
+        <p style="font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--gc-secondary);">Cornell Commits</p>
+        <p class="stat-number" style="color:var(--gc-blue); margin-top:8px;" id="cornell-stat">$23.5M</p>
+        <p style="font-size:0.85rem; color:var(--gc-secondary); margin-top:8px;">Over 3 years</p>
+        <div style="margin-top:16px; font-size:0.8rem; color:var(--gc-secondary); line-height:1.8;">
+          <div><strong style="color:var(--gc-text);">$17.5M</strong> Enterprise Agreement</div>
+          <div style="padding-left:16px; font-size:0.75rem;">Compute + Premium Support + Gemini Enterprise + TAM</div>
+          <div style="margin-top:4px;"><strong style="color:var(--gc-text);">$6M</strong> Professional Services Credits</div>
+          <div style="padding-left:16px; font-size:0.75rem;">Flexible draw-down, not fixed scope</div>
+        </div>
+      </div>
+    </div>
+    <div class="reveal-scale" data-step="2">
+      <div style="background:var(--gc-surface); border-radius:var(--radius); padding:28px; border-left:4px solid var(--gc-green);">
+        <p style="font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--gc-secondary);">Google Contributes</p>
+        <p class="stat-number" style="color:var(--gc-green); margin-top:8px;" id="google-stat">~$27M</p>
+        <p style="font-size:0.85rem; color:var(--gc-secondary); margin-top:8px;">Total value</p>
+        <div style="margin-top:16px; font-size:0.75rem; color:var(--gc-secondary); line-height:1.8;">
+          <div><strong style="color:var(--gc-text);">$11M</strong> AI Skills Development</div>
+          <div><strong style="color:var(--gc-text);">$7M</strong> GPU/TPU discounts (40% avg)</div>
+          <div><strong style="color:var(--gc-text);">$2.4M</strong> Seed funding & Research Credits</div>
+          <div><strong style="color:var(--gc-text);">$2M</strong> Early Access to Innovation</div>
+          <div><strong style="color:var(--gc-text);">$1.5M</strong> Rapid Innovation Team</div>
+          <div><strong style="color:var(--gc-text);">$1.2M</strong> Gemini Enterprise subsidy</div>
+          <div><strong style="color:var(--gc-text);">$1–2M</strong> Google.org AI for Science Fund</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="gc-banner"><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div></div>
+</div>
+
+<!-- SLIDE 15: Chargeback & Predictability -->
+<div class="slide" id="slide-16">
+  <div class="gc-logo"><span style="color:#4285F4">G</span><span style="color:#EA4335">o</span><span style="color:#FBBC04">o</span><span style="color:#4285F4">g</span><span style="color:#34A853">l</span><span style="color:#EA4335">e</span> <span style="color:#5F6368">Cloud</span></div>
+  <div class="reveal" data-step="0">
+    <h2><strong>Predictability</strong> & Grant Chargeback</h2>
+    <p class="subtext">No surprise bills — every dollar tracked to a grant ID</p>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:24px; width:100%;">
+    <div class="reveal-scale" data-step="1">
+      <div class="card blue-top" style="height:100%;">
+        <div class="gc-badge blue"><span class="material-symbols-outlined">monitoring</span></div>
+        <h3>Cloud Cost Management Console</h3>
+        <div style="margin-top:12px; font-size:0.8rem; color:var(--gc-secondary); line-height:1.8;">
+          <div style="display:flex; align-items:center; gap:6px;"><span class="material-symbols-outlined" style="font-size:16px; color:var(--gc-green);">check_circle</span> Admin-level and PI-level views</div>
+          <div style="display:flex; align-items:center; gap:6px;"><span class="material-symbols-outlined" style="font-size:16px; color:var(--gc-green);">check_circle</span> Map consumption to grant IDs (NIH, NSF, DOE)</div>
+          <div style="display:flex; align-items:center; gap:6px;"><span class="material-symbols-outlined" style="font-size:16px; color:var(--gc-green);">check_circle</span> Real-time "burn rate" vs grant timelines</div>
+          <div style="display:flex; align-items:center; gap:6px;"><span class="material-symbols-outlined" style="font-size:16px; color:var(--gc-green);">check_circle</span> Automated showback/chargeback</div>
+          <div style="display:flex; align-items:center; gap:6px;"><span class="material-symbols-outlined" style="font-size:16px; color:var(--gc-green);">check_circle</span> BigQuery billing export for custom dashboards</div>
+        </div>
+      </div>
+    </div>
+    <div class="reveal-scale" data-step="2">
+      <div class="card green-top" style="height:100%;">
+        <div class="gc-badge green"><span class="material-symbols-outlined">lock</span></div>
+        <h3>Predictable Cost Levers</h3>
+        <div style="margin-top:12px; font-size:0.8rem; color:var(--gc-secondary); line-height:1.8;">
+          <div style="display:flex; align-items:center; gap:6px;"><span class="material-symbols-outlined" style="font-size:16px; color:var(--gc-blue);">savings</span> <strong style="color:var(--gc-text);">CUDs + Reservations</strong> lock price & capacity</div>
+          <div style="display:flex; align-items:center; gap:6px;"><span class="material-symbols-outlined" style="font-size:16px; color:var(--gc-blue);">speed</span> <strong style="color:var(--gc-text);">DWS Flex-start</strong> — known discount rate</div>
+          <div style="display:flex; align-items:center; gap:6px;"><span class="material-symbols-outlined" style="font-size:16px; color:var(--gc-blue);">tune</span> <strong style="color:var(--gc-text);">Provisioned Throughput</strong> for Gemini</div>
+          <div style="padding-left:28px; font-size:0.75rem; margin-top:2px;">Fixed monthly GSU cost · priority over on-demand · availability SLA · PT baseload + Priority PayGo for peaks</div>
+          <div style="display:flex; align-items:center; gap:6px; margin-top:4px;"><span class="material-symbols-outlined" style="font-size:16px; color:var(--gc-blue);">science</span> <strong style="color:var(--gc-text);">$5K/faculty/yr</strong> Research Credits sandbox</div>
+          <div style="display:flex; align-items:center; gap:6px;"><span class="material-symbols-outlined" style="font-size:16px; color:var(--gc-blue);">work</span> <strong style="color:var(--gc-text);">$6M PS Credits</strong> — flexible draw-down</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="gc-banner"><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div></div>
+</div>
+
+<!-- SLIDE 16: The Flywheel -->
+<div class="slide dark-bg" id="slide-17">
+  <div class="gc-logo"><span style="color:#4285F4">G</span><span style="color:#EA4335">o</span><span style="color:#FBBC04">o</span><span style="color:#4285F4">g</span><span style="color:#34A853">l</span><span style="color:#EA4335">e</span> <span style="color:rgba(255,255,255,0.5)">Cloud</span></div>
+  <div class="reveal" data-step="0">
+    <h2 style="color:#fff;">The <strong style="color:var(--gc-blue-200);">Self-Sustaining</strong> Research Flywheel</h2>
+    <p style="color:rgba(255,255,255,0.5); margin-top:8px; font-size:0.9rem;">Proven at SUNY — the model funds itself</p>
+  </div>
+  <div class="gc-flow reveal" data-step="1" style="margin-top:48px; gap:0;">
+    <div class="gc-flow-box blue" style="min-width:150px;">
+      <span class="material-symbols-outlined">redeem</span>
+      <span>Research Credits</span>
+      <span style="font-size:0.65rem; opacity:0.8;">$5K/faculty/yr</span>
+    </div>
+    <div class="gc-flow-arrow" style="background:rgba(255,255,255,0.2);"></div>
+    <div class="gc-flow-box green" style="min-width:150px;">
+      <span class="material-symbols-outlined">science</span>
+      <span>Initial Experiments</span>
+      <span style="font-size:0.65rem; opacity:0.8;">Zero barrier to entry</span>
+    </div>
+    <div class="gc-flow-arrow" style="background:rgba(255,255,255,0.2);"></div>
+    <div class="gc-flow-box yellow" style="min-width:150px;">
+      <span class="material-symbols-outlined">description</span>
+      <span>Preliminary Data</span>
+      <span style="font-size:0.65rem; opacity:0.8;">Grant-ready results</span>
+    </div>
+    <div class="gc-flow-arrow" style="background:rgba(255,255,255,0.2);"></div>
+    <div class="gc-flow-box red" style="min-width:150px;">
+      <span class="material-symbols-outlined">emoji_events</span>
+      <span>Win Grants</span>
+      <span style="font-size:0.65rem; opacity:0.8;">NIH · NSF · DOE</span>
+    </div>
+    <div class="gc-flow-arrow" style="background:rgba(255,255,255,0.2);"></div>
+    <div class="gc-flow-box dark-blue" style="min-width:150px;">
+      <span class="material-symbols-outlined">cloud</span>
+      <span>Fund Compute</span>
+      <span style="font-size:0.65rem; opacity:0.8;">Grants → cloud spend</span>
+    </div>
+  </div>
+  <div class="gc-banner"><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div></div>
+</div>
+
+<!-- SLIDE 17: Section — Partnership -->
+<div class="slide colored-bg gc-blue-bg" id="slide-18">
+  <div class="gc-logo"><span style="color:rgba(255,255,255,0.8)">G</span><span style="color:rgba(255,255,255,0.6)">o</span><span style="color:rgba(255,255,255,0.8)">o</span><span style="color:rgba(255,255,255,0.8)">g</span><span style="color:rgba(255,255,255,0.6)">l</span><span style="color:rgba(255,255,255,0.6)">e</span> <span style="color:rgba(255,255,255,0.5)">Cloud</span></div>
+  <div class="reveal" data-step="0">
+    <div class="section-number" style="color:#fff;">03</div>
+    <div class="section-title" style="color:#fff;">Partnership<br>Differentiators</div>
+  </div>
+  <div class="reveal" data-step="1" style="margin-top:24px; max-width:50%;">
+    <p style="opacity:0.85; font-size:1rem;">What sets this apart from a cloud contract</p>
+  </div>
+  <div class="edge-dots"><div class="edge-dot"></div><div class="edge-dot"></div><div class="edge-dot"></div><div class="edge-dot"></div></div>
+  <div class="gc-banner"><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div></div>
+</div>
+
+<!-- SLIDE 18: Beyond Infrastructure -->
+<div class="slide" id="slide-19">
+  <div class="gc-logo"><span style="color:#4285F4">G</span><span style="color:#EA4335">o</span><span style="color:#FBBC04">o</span><span style="color:#4285F4">g</span><span style="color:#34A853">l</span><span style="color:#EA4335">e</span> <span style="color:#5F6368">Cloud</span></div>
+  <div class="reveal" data-step="0">
+    <h2>Beyond <strong>Infrastructure</strong></h2>
+    <p class="subtext">A partnership no other cloud provider can offer</p>
+  </div>
+  <div class="numbered-grid">
+    <div class="reveal" data-step="1">
+      <div class="numbered-item-num">01</div>
+      <div class="numbered-item-title">Google Research</div>
+      <div class="numbered-item-text">Direct connections to DeepMind, Google Health. Named contacts: Royal Hansen (AI Security), Christopher Haire (Earth AI), Niv Efron (LLMs for EDU/Climate)</div>
+    </div>
+    <div class="reveal" data-step="2">
+      <div class="numbered-item-num">02</div>
+      <div class="numbered-item-title">Co-Scientist</div>
+      <div class="numbered-item-text">Multi-agent AI for hypothesis generation. Private preview with Daiichi Sankyo, Bayer, DOE National Labs. Cornell via Early Access Program.</div>
+    </div>
+    <div class="reveal" data-step="3">
+      <div class="numbered-item-num">03</div>
+      <div class="numbered-item-title">Rapid Innovation Team</div>
+      <div class="numbered-item-text">1 high-impact prototype/year. 6–9 week sprints. Source code + production roadmap included. GrantAI, Student Success Agent examples.</div>
+    </div>
+    <div class="reveal" data-step="4">
+      <div class="numbered-item-num">04</div>
+      <div class="numbered-item-title">Early Access Program</div>
+      <div class="numbered-item-text">Pre-release access to AlphaFold, AlphaGenome, AlphaEvolve, Earth AI, WeatherNext — before competing institutions.</div>
+    </div>
+    <div class="reveal" data-step="5">
+      <div class="numbered-item-num">05</div>
+      <div class="numbered-item-title">GrantAI</div>
+      <div class="numbered-item-text">Custom AI for grant lifecycle — precision identification, collaboration matching, generative proposal drafting. Built on Gemini Enterprise.</div>
+    </div>
+    <div class="reveal" data-step="6">
+      <div class="numbered-item-num">06</div>
+      <div class="numbered-item-title">Google.org Fund</div>
+      <div class="numbered-item-text">$1–2M AI for Science Capacity Fund pilot. Catalytic funding + compute credits + white-glove expertise. Independent of commercial deal.</div>
+    </div>
+  </div>
+  <div class="gc-banner"><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div></div>
+</div>
+
+<!-- SLIDE 19: Next Steps -->
+<div class="slide" id="slide-20">
+  <div class="gc-logo"><span style="color:#4285F4">G</span><span style="color:#EA4335">o</span><span style="color:#FBBC04">o</span><span style="color:#4285F4">g</span><span style="color:#34A853">l</span><span style="color:#EA4335">e</span> <span style="color:#5F6368">Cloud</span></div>
+  <div class="reveal" data-step="0">
+    <h2>Proposed <strong>Next Steps</strong></h2>
+    <p class="subtext">Concrete actions to move from conversation to shared design</p>
+  </div>
+  <div class="timeline-container reveal" data-step="1">
+    <div class="timeline-item">
+      <div class="timeline-dot" style="background:var(--gc-blue);"></div>
+      <div class="t-label">Within 2 Weeks</div>
+      <div class="t-text">Cornell identifies 2–3 faculty workloads for cloud benchmark</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot" style="background:var(--gc-green);"></div>
+      <div class="t-label">3–4 Weeks</div>
+      <div class="t-text">Google runs TPU vs GPU price-performance benchmark on real workloads</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot" style="background:var(--gc-yellow);"></div>
+      <div class="t-label">4–6 Weeks</div>
+      <div class="t-text">Joint architecture workshop — detailed hybrid design with Cornell IT</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot" style="background:var(--gc-red);"></div>
+      <div class="t-label">4–6 Weeks</div>
+      <div class="t-text">Draft Enterprise Agreement terms for Cornell review</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot" style="background:var(--gc-dark-blue);"></div>
+      <div class="t-label">Post-Award</div>
+      <div class="t-text">Executive briefing to formally launch partnership</div>
+    </div>
+  </div>
+  <div class="reveal" data-step="2" style="margin-top:40px;">
+    <div style="background:var(--gc-surface); border-radius:8px; padding:16px 20px; border-left:4px solid var(--gc-green); max-width:70%;">
+      <p style="font-size:0.85rem; color:var(--gc-secondary);"><span class="material-symbols-outlined" style="font-size:18px; vertical-align:-3px; color:var(--gc-green);">lightbulb</span> <strong style="color:var(--gc-text);">Our goal today:</strong> Leave with enough shared understanding to begin the benchmark and architecture workshop immediately.</p>
+    </div>
+  </div>
+  <div class="gc-banner"><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div></div>
+</div>
+
+<!-- SLIDE 20: Thank You -->
+<div class="slide" id="slide-21">
+  <div class="gc-logo" style="font-size:18px;"><span style="color:#4285F4">G</span><span style="color:#EA4335">o</span><span style="color:#FBBC04">o</span><span style="color:#4285F4">g</span><span style="color:#34A853">l</span><span style="color:#EA4335">e</span> <span style="color:#5F6368">Cloud</span></div>
+  <div class="reveal-blur" data-step="0" style="text-align:left;">
+    <h1 style="font-size:3.5rem;">Thank you</h1>
+    <p class="subtext" style="margin-top:16px;">Let's build this together.</p>
+  </div>
+  <div class="gc-banner"><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div><div class="gc-band"></div></div>
+</div>
+
+<!-- Navigation -->
+<div class="progress" id="progress"></div>
+<div class="slide-number" id="slideNumber">1 / 21</div>
+
+<script>
+const totalSlides = 21;
+let current = 0;
+let revealStep = {};
+for (let i = 0; i < totalSlides; i++) revealStep[i] = -1;
+
+const progress = document.getElementById('progress');
+for (let i = 0; i < totalSlides; i++) {
+  const dot = document.createElement('div');
+  dot.className = 'dot' + (i === 0 ? ' active' : '');
+  dot.addEventListener('click', (e) => { e.stopPropagation(); goTo(i); });
+  progress.appendChild(dot);
+}
+
+function getMaxStep(slideIdx) {
+  const slide = document.querySelectorAll('.slide')[slideIdx];
+  const reveals = slide.querySelectorAll('[data-step]');
+  let max = -1;
+  reveals.forEach(r => { max = Math.max(max, parseInt(r.dataset.step)); });
+  return max;
+}
+
+function showReveals(slideIdx, upToStep, animate) {
+  const slide = document.querySelectorAll('.slide')[slideIdx];
+  const reveals = slide.querySelectorAll('[data-step]');
+  reveals.forEach(r => {
+    const step = parseInt(r.dataset.step);
+    if (step <= upToStep) {
+      r.classList.add(animate ? 'shown' : 'shown-fast');
+      r.classList.remove(animate ? 'shown-fast' : '');
+    } else {
+      r.classList.remove('shown', 'shown-fast');
+    }
+  });
+}
+
+function goTo(n, direction) {
+  const slides = document.querySelectorAll('.slide');
+  if (n === current && direction === undefined) {
+    const maxStep = getMaxStep(current);
+    revealStep[current] = maxStep;
+    showReveals(current, maxStep, false);
+    return;
+  }
+  slides[current].classList.remove('active');
+  progress.children[current].classList.remove('active');
+  current = Math.max(0, Math.min(n, totalSlides - 1));
+  slides[current].classList.add('active');
+  progress.children[current].classList.add('active');
+  document.getElementById('slideNumber').textContent = (current + 1) + ' / ' + totalSlides;
+
+  if (direction === 'back') {
+    const maxStep = getMaxStep(current);
+    revealStep[current] = maxStep;
+    showReveals(current, maxStep, false);
+  } else {
+    revealStep[current] = -1;
+    showReveals(current, -1, false);
+    advance();
+  }
+}
+
+function advance() {
+  const maxStep = getMaxStep(current);
+  if (revealStep[current] < maxStep) {
+    revealStep[current]++;
+    showReveals(current, revealStep[current], true);
+    return true;
+  }
+  return false;
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+    e.preventDefault();
+    if (!advance()) {
+      if (current < totalSlides - 1) goTo(current + 1, 'forward');
+    }
+  }
+  if (e.key === 'ArrowLeft') {
+    e.preventDefault();
+    if (current > 0) goTo(current - 1, 'back');
+  }
+  if (e.key === 'f') document.documentElement.requestFullscreen?.();
+});
+
+document.addEventListener('click', (e) => {
+  if (e.target.closest('.progress')) return;
+  if (e.detail === 2) { document.documentElement.requestFullscreen?.(); return; }
+  if (!advance()) {
+    if (current < totalSlides - 1) goTo(current + 1, 'forward');
+  }
+});
+
+let cursorTimer;
+document.addEventListener('mousemove', () => {
+  document.body.classList.add('cursor-visible');
+  clearTimeout(cursorTimer);
+  cursorTimer = setTimeout(() => document.body.classList.remove('cursor-visible'), 3000);
+});
+
+advance();
+</script>
+</body>
+</html>
